@@ -1,6 +1,13 @@
 admins = {
     "{{ .Env.JICOFO_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}",
-    "{{ .Env.JVB_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}"
+    "ap-northeast-1-jvb-1@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-2@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-3@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-4@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-5@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-6@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-7@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-8@{{ .Env.XMPP_AUTH_DOMAIN }}"
 }
 
 plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom" }
