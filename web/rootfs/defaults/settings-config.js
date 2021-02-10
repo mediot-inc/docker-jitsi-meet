@@ -8,6 +8,9 @@
 {{ $ENABLE_LIPSYNC := .Env.ENABLE_LIPSYNC | default "false" | toBool -}}
 {{ $ENABLE_NO_AUDIO_DETECTION := .Env.ENABLE_NO_AUDIO_DETECTION | default "false" | toBool -}}
 {{ $ENABLE_P2P := .Env.ENABLE_P2P | default "true" | toBool -}}
+{{ $ENABLE_PREJOIN_PAGE := .Env.ENABLE_PREJOIN_PAGE | default "false" | toBool -}}
+{{ $ENABLE_WELCOME_PAGE := .Env.ENABLE_WELCOME_PAGE | default "true" | toBool -}}
+{{ $ENABLE_CLOSE_PAGE := .Env.ENABLE_CLOSE_PAGE | default "false" | toBool -}}
 {{ $ENABLE_RECORDING := .Env.ENABLE_RECORDING | default "false" | toBool -}}
 {{ $ENABLE_REMB := .Env.ENABLE_REMB | default "true" | toBool -}}
 {{ $ENABLE_REQUIRE_DISPLAY_NAME := .Env.ENABLE_REQUIRE_DISPLAY_NAME | default "false" | toBool -}}
@@ -17,17 +20,19 @@
 {{ $ENABLE_TALK_WHILE_MUTED := .Env.ENABLE_TALK_WHILE_MUTED | default "false" | toBool -}}
 {{ $ENABLE_TCC := .Env.ENABLE_TCC | default "true" | toBool -}}
 {{ $ENABLE_TRANSCRIPTIONS := .Env.ENABLE_TRANSCRIPTIONS | default "false" | toBool -}}
-{{ $P2P_USE_STUN_TURN := .Env.P2P_USE_STUN_TURN | default "true" | toBool -}}
 {{ $RESOLUTION := .Env.RESOLUTION | default "720" -}}
 {{ $RESOLUTION_MIN := .Env.RESOLUTION_MIN | default "180" -}}
 {{ $RESOLUTION_WIDTH := .Env.RESOLUTION_WIDTH | default "1280" -}}
 {{ $RESOLUTION_WIDTH_MIN := .Env.RESOLUTION_WIDTH_MIN | default "320" -}}
 {{ $START_AUDIO_ONLY := .Env.START_AUDIO_ONLY | default "false" | toBool -}}
 {{ $START_AUDIO_MUTED := .Env.START_AUDIO_MUTED | default 10 -}}
+{{ $DISABLE_AUDIO_LEVELS := .Env.DISABLE_AUDIO_LEVELS | default "false" | toBool -}}
+{{ $ENABLE_NOISY_MIC_DETECTION := .Env.ENABLE_NOISY_MIC_DETECTION | default "true" | toBool -}}
 {{ $START_VIDEO_MUTED := .Env.START_VIDEO_MUTED | default 10 -}}
+{{ $DESKTOP_SHARING_FRAMERATE_MIN := .Env.DESKTOP_SHARING_FRAMERATE_MIN | default 5 -}}
+{{ $DESKTOP_SHARING_FRAMERATE_MAX := .Env.DESKTOP_SHARING_FRAMERATE_MAX | default 5 -}}
 {{ $TESTING_OCTO_PROBABILITY := .Env.TESTING_OCTO_PROBABILITY | default "0" -}}
 {{ $TESTING_CAP_SCREENSHARE_BITRATE := .Env.TESTING_CAP_SCREENSHARE_BITRATE | default "1" -}}
-{{ $USE_STUN_TURN := .Env.USE_STUN_TURN | default "true" | toBool -}}
 {{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN -}}
 {{ $XMPP_RECORDER_DOMAIN := .Env.XMPP_RECORDER_DOMAIN -}}
 
@@ -47,7 +52,10 @@ config.startVideoMuted = {{ $START_VIDEO_MUTED }};
 {{ if .Env.START_BITRATE -}}
 config.startBitrate = '{{ .Env.START_BITRATE }}';
 {{ end -}}
-
+ 
+// ScreenShare Configuration.
+//
+config.desktopSharingFrameRate = { min: {{ $DESKTOP_SHARING_FRAMERATE_MIN }}, max: {{ $DESKTOP_SHARING_FRAMERATE_MAX }} };
 
 // Audio configuration.
 //
@@ -58,6 +66,8 @@ config.disableAP = {{ not $ENABLE_AUDIO_PROCESSING }};
 config.stereo = {{ $ENABLE_STEREO }};
 config.startAudioOnly = {{ $START_AUDIO_ONLY }};
 config.startAudioMuted = {{ $START_AUDIO_MUTED }};
+config.disableAudioLevels = {{ $DISABLE_AUDIO_LEVELS }};
+config.enableNoisyMicDetection = {{ $ENABLE_NOISY_MIC_DETECTION }};
 
 
 // Peer-to-Peer options.
@@ -66,7 +76,6 @@ config.startAudioMuted = {{ $START_AUDIO_MUTED }};
 if (!config.hasOwnProperty('p2p')) config.p2p = {};
 
 config.p2p.enabled = {{ $ENABLE_P2P }};
-config.p2p.useStunTurn = {{ $P2P_USE_STUN_TURN }};
 
 
 // Etherpad
@@ -223,6 +232,15 @@ config.peopleSearchQueryTypes = ['user','conferenceRooms'];
 // Miscellaneous.
 //
 
+// Prejoin page.
+config.prejoinPageEnabled = {{ $ENABLE_PREJOIN_PAGE }};
+
+// Welcome page.
+config.enableWelcomePage = {{ $ENABLE_WELCOME_PAGE }};
+
+// Close page.
+config.enableClosePage = {{ $ENABLE_CLOSE_PAGE }};
+
 // Require users to always specify a display name.
 config.requireDisplayName = {{ $ENABLE_REQUIRE_DISPLAY_NAME }};
 
@@ -246,15 +264,17 @@ config.openBridgeChannel = '{{ $BRIDGE_CHANNEL }}';
 // Enable IPv6 support.
 config.useIPv6 = {{ $ENABLE_IPV6 }};
 
-// Use XEP-0215 to fetch STUN and TURN servers.
-config.useStunTurn = {{ $USE_STUN_TURN }};
-
 // Transcriptions (subtitles and buttons can be configured in interface_config)
 config.transcribingEnabled = {{ $ENABLE_TRANSCRIPTIONS }};
 
-{{ if .Env.BRANDING_DATA_URL -}}
+{{ if .Env.DYNAMIC_BRANDING_URL -}}
 // External API url used to receive branding specific information.
-config.brandingDataUrl = '{{ .Env.BRANDING_DATA_URL }}';
+config.dynamicBrandingUrl = '{{ .Env.DYNAMIC_BRANDING_URL }}';
+{{ end -}}
+
+{{ if .Env.TOKEN_AUTH_URL -}}
+// Authenticate using external service or just focus external auth window if there is one already.
+config.tokenAuthUrl = '{{ .Env.TOKEN_AUTH_URL }}';
 {{ end -}}
 
 
