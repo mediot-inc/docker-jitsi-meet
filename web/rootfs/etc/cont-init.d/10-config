@@ -79,12 +79,14 @@ tpl /defaults/default > /config/nginx/site-confs/default
 cp /defaults/config.js /config/config.js
 tpl /defaults/system-config.js >> /config/config.js
 tpl /defaults/settings-config.js >> /config/config.js
+cat /defaults/mediot_config.js >> /config/config.js
 if [[ -f /config/custom-config.js ]]; then
     cat /config/custom-config.js >> /config/config.js
 fi
 
 if [[ ! -f /config/interface_config.js ]]; then
     cp /defaults/interface_config.js /config/interface_config.js
+    cat /defaults/mediot_interface_config.js >> /config/interface_config.js
 
     # It will remove parameter 'closedcaptions' from TOOLBAR_BUTTONS if ENABLE_TRANSCRIPTIONS is false,
     # because it enabled by default, but not supported out of the box.

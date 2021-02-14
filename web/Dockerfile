@@ -10,9 +10,9 @@ RUN \
 	apt-dpkg-wrap apt-get -d install -y jitsi-meet-web-config && \
     dpkg -x /var/cache/apt/archives/jitsi-meet-web-config*.deb /tmp/pkg && \
     mv /tmp/pkg/usr/share/jitsi-meet-web-config/config.js /defaults && \
-	mv /usr/share/jitsi-meet/interface_config.js /defaults && \
-	rm -f /etc/nginx/conf.d/default.conf && \
+    mv /usr/share/jitsi-meet/interface_config.js /defaults && \
 	apt-cleanup && \
+	rm -f /etc/nginx/conf.d/default.conf && \
 	rm -rf /tmp/pkg /var/cache/apt
 
 EXPOSE 80 443

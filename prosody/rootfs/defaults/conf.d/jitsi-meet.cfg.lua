@@ -1,6 +1,13 @@
 admins = {
     "{{ .Env.JICOFO_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}",
-    "{{ .Env.JVB_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}"
+    "ap-northeast-1-jvb-1@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-2@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-3@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-4@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-5@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-6@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-7@{{ .Env.XMPP_AUTH_DOMAIN }}",
+    "ap-northeast-1-jvb-8@{{ .Env.XMPP_AUTH_DOMAIN }}"
 }
 
 plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom" }
@@ -168,6 +175,7 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
 
 Component "focus.{{ .Env.XMPP_DOMAIN }}"
     component_secret = "{{ .Env.JICOFO_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
 
 Component "speakerstats.{{ .Env.XMPP_DOMAIN }}" "speakerstats_component"
     muc_component = "{{ .Env.XMPP_MUC_DOMAIN }}"
@@ -182,3 +190,35 @@ Component "lobby.{{ .Env.XMPP_DOMAIN }}" "muc"
     muc_room_locking = false
     muc_room_default_public_jids = true
 {{ end }}
+
+Component "ap-northeast-1-jvb-1.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-2.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-3.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-4.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-5.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-6.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-7.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
+
+Component "ap-northeast-1-jvb-8.{{ .Env.XMPP_DOMAIN }}"
+    component_secret = "{{ .Env.JVB_COMPONENT_SECRET }}"
+    component_conflict_resolve = "kick_old"
