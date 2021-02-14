@@ -1,6 +1,6 @@
 #!/usr/bin/with-contenv bash
 
-JAVA_SYS_PROPS="-Djava.util.logging.config.file=/config/logging.properties -Dconfig.file=/config/jicofo.conf"
+JAVA_SYS_PROPS="-Djava.util.logging.config.file=/config/logging.properties -Dconfig.file=/config/jicofo.conf -Dnetworkaddress.cache.ttl=0 -Dnetworkaddress.cache.negative.ttl=0"
 DAEMON=/usr/share/jicofo/jicofo.sh
 DAEMON_DIR=/usr/share/jicofo/
 DAEMON_OPTS="--domain=$XMPP_DOMAIN --host=$XMPP_SERVER --secret=$JICOFO_COMPONENT_SECRET --user_name=$JICOFO_AUTH_USER --user_domain=$XMPP_AUTH_DOMAIN --user_password=$JICOFO_AUTH_PASSWORD"
