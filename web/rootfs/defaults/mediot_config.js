@@ -37,3 +37,7 @@ config.startBitrate = "356";
 config.prejoinPageEnabled = false;
 config.enableWelcomePage = false;
 config.enableClosePage = false;
+
+// Options related to the remote participant menu.
+if (!config.hasOwnProperty('remoteVideoMenu')) config.remoteVideoMenu = {};
+config.remoteVideoMenu.disableKick = true;
