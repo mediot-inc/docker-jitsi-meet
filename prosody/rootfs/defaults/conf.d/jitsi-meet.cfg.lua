@@ -173,8 +173,8 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
     muc_room_locking = false
     muc_room_default_public_jids = true
 
-Component "focus.{{ .Env.XMPP_DOMAIN }}"
-    component_secret = "{{ .Env.JICOFO_COMPONENT_SECRET }}"
+Component "focus.{{ .Env.XMPP_DOMAIN }}" "client_proxy"
+    target_address = "{{ .Env.JICOFO_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}"
     component_conflict_resolve = "kick_old"
 
 Component "speakerstats.{{ .Env.XMPP_DOMAIN }}" "speakerstats_component"
