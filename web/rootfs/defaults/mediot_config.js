@@ -41,3 +41,6 @@ config.enableClosePage = false;
 // Options related to the remote participant menu.
 if (!config.hasOwnProperty('remoteVideoMenu')) config.remoteVideoMenu = {};
 config.remoteVideoMenu.disableKick = true;
+
+config.disableRemoteMute = true;
+config.disableRemoteControl = true;
