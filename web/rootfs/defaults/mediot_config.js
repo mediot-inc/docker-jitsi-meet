@@ -1,10 +1,20 @@
+// for the peformance turning
+// https://blog.gtsop.me/jitsi-meet-performance-tuning.html
+config.disableAudioLevels = true;
+config.enableNoAudioDetection = false;
+config.enableNoisyMicDetection = false;
+
+config.enableLayerSuspension = true;
+
 // p2p related
 if (!config.hasOwnProperty('p2p')) config.p2p = {};
 config.p2p.stunServers = [
   { urls: 'stun:meet-jit-si-turnrelay.jitsi.net:443' },
   { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' },
+  { urls: 'stun:stun3.l.google.com:19302' },
+  { urls: 'stun:stun4.l.google.com:19302' },
 ];
 
 // video queality

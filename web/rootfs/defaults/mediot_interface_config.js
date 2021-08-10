@@ -8,3 +8,13 @@ interfaceConfig.HIDE_INVITE_MORE_HEADER = true;
 interfaceConfig.APP_NAME = 'FarHugs';
 interfaceConfig.NATIVE_APP_NAME = 'FarHugs';
 interfaceConfig.PROVIDER_NAME = 'FarHugs';
+
+// for the peformance turning
+// https://blog.gtsop.me/jitsi-meet-performance-tuning.html
+interfaceConfig.SET_FILMSTRIP_ENABLED = false;
+interfaceConfig.DISABLE_VIDEO_BACKGROUND = true;
+
+interfaceConfig.DISABLE_FOCUS_INDICATOR = true;
+interfaceConfig.DISABLE_DOMINANT_SPEAKER_INDICATOR = true;
+
+interfaceConfig.DISABLE_JOIN_LEAVE_NOTIFICATIONS =true;
