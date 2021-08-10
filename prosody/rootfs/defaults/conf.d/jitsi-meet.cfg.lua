@@ -16,6 +16,8 @@ unlimited_jids = {
 }
 
 plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom" }
+-- domain mapper options, must at least have domain base set to use the mapper
+muc_mapper_domain_base = "{{ .Env.XMPP_DOMAIN }}";
 http_default_host = "{{ .Env.XMPP_DOMAIN }}"
 
 {{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "0" | toBool }}
@@ -29,6 +31,26 @@ http_default_host = "{{ .Env.XMPP_DOMAIN }}"
 
 {{ $ENABLE_XMPP_WEBSOCKET := .Env.ENABLE_XMPP_WEBSOCKET | default "1" | toBool }}
 {{ $PUBLIC_URL := .Env.PUBLIC_URL | default "https://localhost:8443" -}}
+{{ $TURN_PORT := .Env.TURN_PORT | default "443" }}
+{{ $TURNS_PORT := .Env.TURNS_PORT | default "443" }}
+
+{{ if .Env.TURN_CREDENTIALS }}
+external_service_secret = "{{.Env.TURN_CREDENTIALS}}";
+{{ end }}
+
+{{ if or .Env.TURN_HOST .Env.TURNS_HOST }}
+external_services = {
+  {{ if .Env.TURN_HOST }}
+     { type = "turn", host = "{{ .Env.TURN_HOST }}", port = {{ $TURN_PORT }}, transport = "tcp", secret = true, ttl = 86400, algorithm = "turn" }
+  {{ end }}
+  {{ if and .Env.TURN_HOST .Env.TURNS_HOST }}
+  ,
+  {{ end }}
+  {{ if .Env.TURNS_HOST }}
+     { type = "turns", host = "{{ .Env.TURNS_HOST }}", port = {{ $TURNS_PORT }}, transport = "tcp", secret = true, ttl = 86400, algorithm = "turn" }
+  {{ end }}
+};
+{{ end }}
 
 {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") .Env.JWT_ACCEPTED_ISSUERS }}
 asap_accepted_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ISSUERS) }}" }
@@ -98,6 +120,9 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
         "ping";
         "speakerstats";
         "conference_duration";
+        {{ if or .Env.TURN_HOST .Env.TURNS_HOST }}
+        "external_services";
+        {{ end }}
         {{ if $ENABLE_LOBBY }}
         "muc_lobby_rooms";
         {{ end }}
