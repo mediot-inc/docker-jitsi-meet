@@ -49,14 +49,7 @@ if [[ "$JVB_AUTH_PASSWORD" == "$OLD_JVB_AUTH_PASSWORD" ]]; then
 fi
 
 # configure jvb
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-1 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-2 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-3 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-4 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-5 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-6 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-7 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
-prosodyctl --config $PROSODY_CFG register ap-northeast-1-jvb-8 $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
+prosodyctl --config $PROSODY_CFG register $JVB_AUTH_USER $XMPP_AUTH_DOMAIN $JVB_AUTH_PASSWORD
 
 if [[ ! -z $JIBRI_XMPP_USER ]] && [[ ! -z $JIBRI_XMPP_PASSWORD ]]; then
     OLD_JIBRI_XMPP_PASSWORD=passw0rd
