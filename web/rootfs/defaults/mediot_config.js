@@ -17,6 +17,18 @@ config.p2p.stunServers = [
   { urls: 'stun:meet-jit-si-turnrelay.jitsi.net:443' },
 ];
 
+// https://community.jitsi.org/t/cannot-recover-from-jvb-failover-when-enableunifiedonchrome-true/103986/4
+config.p2p.enableUnifiedOnChrome = true;
+config.enableForcedReload = true;
+
+config.p2p.preferH264 = false;
+config.p2p.preferredCodec = 'VP9';
+config.preferH264 = false;
+
+config.p2p.disableH264 = true;
+config.p2p.disabledCodec = 'H264';
+config.disableH264 = true;
+
 // video queality
 if (!config.hasOwnProperty('constraints')) config.constraints = {};
 config.constraints = {
@@ -37,10 +49,19 @@ config.resolution = 480;
 
 if (!config.hasOwnProperty('videoQuality')) config.videoQuality = {};
 config.videoQuality.maxBitratesVideo = {
-  low: 88889,
-  standard: 222223,
-  high: 666667,
+  VP8: {
+    low: 88889,
+    standard: 222223,
+    high: 666667,
+  },
+  VP9: {
+    low: 44445,
+    standard: 133334,
+    high: 533334,
+  },
 };
+config.videoQuality.disabledCodec = 'H264';
+config.videoQuality.preferredCodec = 'VP9';
 config.startBitrate = "356";
 
 // sub pages
