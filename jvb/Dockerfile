@@ -7,6 +7,9 @@ RUN \
 	apt-dpkg-wrap apt-get install -y jitsi-videobridge2 jq curl iproute2 && \
 	apt-cleanup
 
+# To bind the port number less than 1024 with non-root access.
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/lib/jvm/adoptopenjdk-8-hotspot-jre-amd64/bin/java
+
 COPY rootfs/ /
 
 VOLUME /config
