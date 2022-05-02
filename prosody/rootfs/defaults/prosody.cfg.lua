@@ -78,6 +78,7 @@ modules_enabled = {
         {{ end }}
 };
 
+component_ports = { }
 https_ports = { }
 
 -- These modules are auto-loaded, but should you want
@@ -91,8 +92,6 @@ modules_disabled = {
 -- Disable account creation by default, for security
 -- For more information see http://prosody.im/doc/creating_accounts
 allow_registration = false;
-
-daemonize = false;
 
 -- Enable rate limits for incoming client and server connections
 limits = {
@@ -173,7 +172,8 @@ network_settings = {
   tcp_backlog = 511;
 }
 
-component_interface = { "*" }
+http_ports = { 5280 }
+http_interfaces = { "*", "::" }
 
 data_path = "/config/data"
 

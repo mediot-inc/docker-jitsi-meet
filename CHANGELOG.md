@@ -1,3 +1,51 @@
+## stable-7210-2
+
+Based on stable release 7210-2.
+
+* 2634e96 misc: working on latest
+
+## stable-7210-1
+
+Based on stable release 7210-1.
+
+* a8e6a34 prosody: completely disable external components
+* 8587d29 prosody: add mod_auth_cyrus from community libraries
+* 3a070e6 misc: working on latest
+
+## stable-7210
+
+Based on stable release 7210.
+
+* 1afa278 prosody: add temporary workaround for JWT auth
+* 6fe240a prosody: update to 0.12
+* 097558b ci: dry run Docker builds on PRs
+* eca5d16 web: fix matching etherpad location
+* 3afc1e3 prosody: update package version
+* b0617c0 web: fix Etherpad when using multi-domain
+* 0ce0f09 prosody: update version
+* 201a1b4 prosody: pin to version 0.11 for now
+* 29b4c23 prosody: use a more recent version of luarocks
+* c5b049a jvb: forward port 8080 to docker host
+* 6af7cd8 doc: update CHANGELOG
+* dd7b70b misc: working on latest
+
+## stable-7001
+
+**IMPORTANT:** Starting with this release TCP has support has been removed from the JVB.
+
+Based on stable release 7001.
+
+* 6e0dd04 base: replace frep with tpl
+* 1b51c77 feat: Enables polls for breakout rooms.
+* 0b019ee feat: Enables tenants/subdomains by default.
+* d50df67 fix: Fixes missing variable for prosody plugins.
+* 88997f5 prosody: authentication by matrix user authentication service
+* 7a93978 jvb: remove TCP support
+* c37706c misc: fix label order in  dockerfiles
+* 0de062b misc: add missing quotes to labels in dockerfiles
+* 76424fd chore: add opencontainers labels to Dockerfiles
+* 3b8ed7e misc: working on latest
+
 ## stable-6865
 
 Based on stable release 6865.

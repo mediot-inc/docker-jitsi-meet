@@ -4,6 +4,8 @@
 {{ $JWT_ASAP_KEYSERVER := .Env.JWT_ASAP_KEYSERVER | default "" }}
 {{ $JWT_ALLOW_EMPTY := .Env.JWT_ALLOW_EMPTY | default "0" | toBool }}
 {{ $JWT_AUTH_TYPE := .Env.JWT_AUTH_TYPE | default "token" }}
+{{ $MATRIX_UVS_ISSUER := .Env.MATRIX_UVS_ISSUER | default "issuer" }}
+{{ $MATRIX_UVS_SYNC_POWER_LEVELS := .Env.MATRIX_UVS_SYNC_POWER_LEVELS | default "0" | toBool }}
 {{ $JWT_TOKEN_AUTH_MODULE := .Env.JWT_TOKEN_AUTH_MODULE | default "token_verification" }}
 {{ $ENABLE_LOBBY := .Env.ENABLE_LOBBY | default "true" | toBool }}
 {{ $ENABLE_AV_MODERATION := .Env.ENABLE_AV_MODERATION | default "true" | toBool }}
@@ -14,6 +16,7 @@
 {{ $TURNS_PORT := .Env.TURNS_PORT | default "443" }}
 {{ $XMPP_MUC_DOMAIN_PREFIX := (split "." .Env.XMPP_MUC_DOMAIN)._0 }}
 {{ $DISABLE_POLLS := .Env.DISABLE_POLLS | default "false" | toBool -}}
+{{ $ENABLE_SUBDOMAINS := .Env.ENABLE_SUBDOMAINS | default "true" | toBool -}}
 
 admins = {
     "{{ .Env.JICOFO_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}",
@@ -59,21 +62,7 @@ asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AU
 {{ end }}
 
 consider_bosh_secure = true;
-
--- Deprecated in 0.12
--- https://github.com/bjc/prosody/commit/26542811eafd9c708a130272d7b7de77b92712de
-{{ $XMPP_CROSS_DOMAINS := $PUBLIC_URL }}
-{{ $XMPP_CROSS_DOMAIN := .Env.XMPP_CROSS_DOMAIN | default "" }}
-{{ if eq $XMPP_CROSS_DOMAIN "true"}}
-cross_domain_websocket = true
-cross_domain_bosh = true
-{{ else }}
-{{ if not (eq $XMPP_CROSS_DOMAIN "false") }}
-  {{ $XMPP_CROSS_DOMAINS = list $PUBLIC_URL (print "https://" .Env.XMPP_DOMAIN) .Env.XMPP_CROSS_DOMAIN | join "," }}
-{{ end }}
-cross_domain_websocket = { "{{ join "\",\"" (splitList "," $XMPP_CROSS_DOMAINS) }}" }
-cross_domain_bosh = { "{{ join "\",\"" (splitList "," $XMPP_CROSS_DOMAINS) }}" }
-{{ end }}
+consider_websocket_secure = true;
 
 VirtualHost "{{ .Env.XMPP_DOMAIN }}"
 {{ if $ENABLE_AUTH }}
@@ -85,11 +74,20 @@ VirtualHost "{{ .Env.XMPP_DOMAIN }}"
     {{ if $JWT_ASAP_KEYSERVER }}
     asap_key_server = "{{ .Env.JWT_ASAP_KEYSERVER }}"
     {{ end }}
-
-    {{ else if eq $AUTH_TYPE "ldap" }}
+  {{ else if eq $AUTH_TYPE "ldap" }}
     authentication = "cyrus"
     cyrus_application_name = "xmpp"
     allow_unencrypted_plain_auth = true
+  {{ else if eq $AUTH_TYPE "matrix" }}
+    authentication = "matrix_user_verification"
+    app_id = "{{ $MATRIX_UVS_ISSUER }}"
+    uvs_base_url = "{{ .Env.MATRIX_UVS_URL }}"
+    {{ if .Env.MATRIX_UVS_AUTH_TOKEN }}
+    uvs_auth_token = "{{ .Env.MATRIX_UVS_AUTH_TOKEN }}"
+    {{ end }}
+    {{ if $MATRIX_UVS_SYNC_POWER_LEVELS }}
+    uvs_sync_power_levels = true
+    {{ end }}
   {{ else if eq $AUTH_TYPE "internal" }}
     authentication = "internal_hashed"
   {{ end }}
@@ -198,9 +196,15 @@ Component "{{ .Env.XMPP_MUC_DOMAIN }}" "muc"
         {{ end -}}
         {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "jwt") -}}
         "{{ $JWT_TOKEN_AUTH_MODULE }}";
+        {{ end }}
+        {{ if and $ENABLE_AUTH (eq $AUTH_TYPE "matrix") $MATRIX_UVS_SYNC_POWER_LEVELS -}}
+        "matrix_power_sync";
         {{ end -}}
         {{ if not $DISABLE_POLLS -}}
         "polls";
+        {{ end -}}
+        {{ if $ENABLE_SUBDOMAINS -}}
+        "muc_domain_mapper";
         {{ end -}}
     }
     muc_room_cache_size = 1000
@@ -236,4 +240,13 @@ Component "breakout.{{ .Env.XMPP_DOMAIN }}" "muc"
     restrict_room_creation = true
     muc_room_locking = false
     muc_room_default_public_jids = true
+    modules_enabled = {
+        "muc_meeting_id";
+        {{ if $ENABLE_SUBDOMAINS -}}
+        "muc_domain_mapper";
+        {{ end -}}
+        {{ if not $DISABLE_POLLS -}}
+        "polls";
+        {{ end -}}
+    }
 {{ end }}
