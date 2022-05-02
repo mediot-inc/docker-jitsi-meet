@@ -267,6 +267,7 @@ services:
         ports:
             - '${JVB_PORT}:${JVB_PORT}/udp'
             - '127.0.0.1:8080:8080'
+            - '${JVB_TCP_PORT}:${JVB_TCP_PORT}'
         volumes:
             - ${CONFIG}/jvb:/config:Z
         environment:
@@ -278,6 +279,9 @@ services:
             - JVB_BREWERY_MUC
             - JVB_PORT
             - JVB_MUC_NICKNAME
+            - JVB_TCP_HARVESTER_DISABLED
+            - JVB_TCP_PORT
+            - JVB_TCP_MAPPED_PORT
             - JVB_STUN_SERVERS
             - JVB_OCTO_BIND_ADDRESS
             - JVB_OCTO_PUBLIC_ADDRESS
