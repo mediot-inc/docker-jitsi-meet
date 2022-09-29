@@ -1,3 +1,103 @@
+## stable-7830
+
+Based on stable release 7830.
+
+* dd95b3d prosody: fix arm64 build
+* acb2f4e misc: update stale.yml
+* 02e32e5 jibri: update Chrome to M105
+* c53de72 jvb: add JVB_ADVERTISE_IPS, deprecating DOCKER_HOST_ADDRESS
+* 723acc2 web: add ability to configure the room password digit size
+* a1e82ea jvb: migrate config to secure octo
+* 91043c5 prosody: upgrade UVS module to be compatible with Prosody 0.12 and luajwtjitsi 3.0
+* dc5b6a1 fix: multi tenant setup (#1401)
+* 47804d0 prosody: add JWT_ENABLE_DOMAIN_VERIFICATION to compose file
+* 832b178 prosody: make GC options configurable
+* bf6a68b web: fix setting prefix for subdomains
+* 5fabec9 prosody: add end conference
+* 7f7a9b4 misc: working on unstable
+
+## stable-7648-4
+
+Based on stable release 7648-4.
+
+* 6449c60 prosody: fix installation of lua inspect module
+* 6664c89 prosody: add missing lua-inspect dependency
+* 755bd3f prosody: add jigasi and jibri users as admins
+* 8c5fba1 jigasi: add ability to disable SIP
+* 4fa0a2f jvb: allow configuration of videobridge.ice.advertise-private-candidates
+* 74e5942 misc: working on unstable
+
+## stable-7648-3
+
+Based on stable release 7648-3.
+
+* 7890183 jibri: fix ENABLE_RECORDING issue
+* a2b86a0 fix: Fixes undefined variable $ENABLE_JAAS_COMPONENTS. Fixes #1377.
+* 9f3c81f misc: working on unstable
+
+## stable-7648-2
+
+Based on stable release 7648-2.
+
+* 24b6adb feat: Adds room info http endpoint for jaas components.
+* 475be2a misc: working on unstable
+
+## stable-7648-1
+
+Based on stable release 7648-1.
+
+* d9921a0 prosody: fix syntax error
+* bc6ce20 jibri: update Chrome to M104
+* 7c7a43a prosody: add ability to configure max occupants
+* 85a38d9 jibri: add ability to enable Dropbox recording without enabling "service recording"
+* f8b7037 jvb: enable multi-stream by default
+* eb0dd6b web: fix receiveMultipleVideoStreams flag
+* 674f134 misc: working on unstable
+
+## stable-7648
+
+Based on stable release 7648.
+
+* 12941f5 web: turn on multi-stream by default
+* 1d4b265 web: add new flag for multi-stream
+* 4264f25 prosody: make enable_domain_verification configurable
+* 2a7db7c jigasi: fix Sentry test
+* 2d106d8 jigasi: adjust log formatter
+* 6c9e305 jigasi: temporarily disable G722
+* 9edecf2 misc: working on unstable
+
+## stable-7577-2
+
+Based on stable release 7577-2.
+
+* 55e0eed prosody: remove explicit dependency
+* e0bc4e4 prosody: add missing net-url dependency
+* e811d7b misc: working on unstable
+
+## stable-7577-1
+
+Based on stable release 7577-1.
+
+* 20eb991 prosody: clean build
+* 6fb422c prosody: fix not finding the basexx and cjsson modules
+* 1768164 misc: working on unstable
+
+## stable-7577
+
+Based on stable release 7577.
+
+* b670959 prosody: simplify container build
+* e05a9c2 fixup: template syntax for newly added variables (#1355)
+* 164d28b web: migrate deprecated recordings options, add some more
+* f126f7a web: set config.videoQuality.maxBitratesVideo to null if no bitrates are specified
+* 0364d94 jibri: remove deprecated PulseAudio module
+* 1c93e1b web: add support for brandingDataUrl (#1346)
+* 4372717 web: add support for wav files to nginx default
+* d804ba4 misc: make ignore rule more generic
+* b224131 prosody: use ENABLE_IPV6 environment variable
+* be8c41f etherpad,jigasi: fix compose file version
+* d7cee00 misc: working on unstable
+
 ## stable-7439-2
 
 Based on stable release 7439-2.

@@ -1,5 +1,12 @@
 {{ $LOG_LEVEL := .Env.LOG_LEVEL | default "info" }}
 {{ $XMPP_PORT := .Env.XMPP_PORT | default "5222" -}}
+{{ $ENABLE_IPV6 := .Env.ENABLE_IPV6 | default "true" | toBool -}}
+{{ $GC_TYPE := .Env.GC_TYPE | default "incremental" -}}
+{{ $GC_INC_TH := .Env.GC_INC_TH | default 150 -}}
+{{ $GC_INC_SPEED := .Env.GC_INC_SPEED | default 250 -}}
+{{ $GC_INC_STEP_SIZE := .Env.GC_INC_STEP_SIZE | default 13 -}}
+{{ $GC_GEN_MIN_TH := .Env.GC_GEN_MIN_TH | default 20 -}}
+{{ $GC_GEN_MAX_TH := .Env.GC_GEN_MAX_TH | default 100 -}}
 
 -- Prosody Example Configuration File
 --
@@ -104,6 +111,23 @@ limits = {
   };
 }
 
+--Prosody garbage collector settings
+--For more information see https://prosody.im/doc/advanced_gc
+{{ if eq $GC_TYPE "generational" }}
+gc = {
+    mode = "generational";
+    minor_threshold = {{ $GC_GEN_MIN_TH }};
+    major_threshold = {{ $GC_GEN_MAX_TH }};
+}
+{{ else }}
+gc = {
+	mode = "incremental";
+	threshold = {{ $GC_INC_TH }};
+	speed = {{ $GC_INC_SPEED }};
+	step_size = {{ $GC_INC_STEP_SIZE }};
+}
+{{ end }}
+
 pidfile = "/config/data/prosody.pid";
 
 -- Force clients to use encrypted connections? This option will
@@ -113,6 +137,11 @@ c2s_require_encryption = false
 
 -- set c2s port
 c2s_ports = { {{ $XMPP_PORT }} } -- Listen on specific c2s port
+{{ if $ENABLE_IPV6 }}
+c2s_interfaces = { "*", "::" }
+{{ else }}
+c2s_interfaces = { "*" }
+{{ end }}
 
 -- Force certificate authentication for server-to-server connections?
 -- This provides ideal security, but requires servers you communicate
@@ -180,7 +209,11 @@ unbound = {
 }
 
 http_ports = { 5280 }
+{{ if $ENABLE_IPV6 }}
 http_interfaces = { "*", "::" }
+{{ else }}
+http_interfaces = { "*" }
+{{ end }}
 
 data_path = "/config/data"
 
