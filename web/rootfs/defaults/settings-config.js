@@ -22,8 +22,13 @@
 {{ $ENABLE_TALK_WHILE_MUTED := .Env.ENABLE_TALK_WHILE_MUTED | default "false" | toBool -}}
 {{ $ENABLE_TCC := .Env.ENABLE_TCC | default "true" | toBool -}}
 {{ $ENABLE_TRANSCRIPTIONS := .Env.ENABLE_TRANSCRIPTIONS | default "false" | toBool -}}
+{{ $TRANSLATION_LANGUAGES := .Env.TRANSLATION_LANGUAGES | default "[]" -}}
+{{ $TRANSLATION_LANGUAGES_HEAD := .Env.TRANSLATION_LANGUAGES_HEAD | default "['en']" -}}
+{{ $USE_APP_LANGUAGE := .Env.USE_APP_LANGUAGE | default "true" | toBool -}}
+{{ $PREFERRED_LANGUAGE := .Env.PREFERRED_LANGUAGE | default "en-US" -}}
+{{ $DISABLE_START_FOR_ALL := .Env.DISABLE_START_FOR_ALL | default "false" | toBool -}}
+{{ $AUTO_CAPTION_ON_RECORD := .Env.AUTO_CAPTION_ON_RECORD | default "false" | toBool -}}
 {{ $ENABLE_JAAS_COMPONENTS := .Env.ENABLE_JAAS_COMPONENTS | default "0" | toBool }}
-{{ $ENABLE_MULTI_STREAM := .Env.ENABLE_MULTI_STREAM | default "true" | toBool }}
 {{ $HIDE_PREJOIN_DISPLAY_NAME := .Env.HIDE_PREJOIN_DISPLAY_NAME | default "false" | toBool -}}
 {{ $PUBLIC_URL := .Env.PUBLIC_URL | default "https://localhost:8443" -}}
 {{ $RESOLUTION := .Env.RESOLUTION | default "720" -}}
@@ -78,9 +83,9 @@ config.startBitrate = '{{ .Env.START_BITRATE }}';
 {{ end -}}
 
 if (!config.hasOwnProperty('flags')) config.flags = {};
-config.flags.sourceNameSignaling = {{ $ENABLE_MULTI_STREAM }};
-config.flags.sendMultipleVideoStreams = {{ $ENABLE_MULTI_STREAM }};
-config.flags.receiveMultipleVideoStreams = {{ $ENABLE_MULTI_STREAM }};
+config.flags.sourceNameSignaling = true;
+config.flags.sendMultipleVideoStreams = true;
+config.flags.receiveMultipleVideoStreams = true;
 
 
 // ScreenShare Configuration.
@@ -337,7 +342,13 @@ config.enableTcc = {{ $ENABLE_TCC }};
 config.useIPv6 = {{ $ENABLE_IPV6 }};
 
 // Transcriptions (subtitles and buttons can be configured in interface_config)
-config.transcribingEnabled = {{ $ENABLE_TRANSCRIPTIONS }};
+config.transcription = { enabled: {{ $ENABLE_TRANSCRIPTIONS }} };
+config.transcription.translationLanguages = {{ $TRANSLATION_LANGUAGES }};
+config.transcription.translationLanguagesHead = {{ $TRANSLATION_LANGUAGES_HEAD }};
+config.transcription.useAppLanguage = {{ $USE_APP_LANGUAGE }};
+config.transcription.preferredLanguage = {{ $PREFERRED_LANGUAGE }};
+config.transcription.disableStartForAll = {{ $DISABLE_START_FOR_ALL }};
+config.transcription.autoCaptionOnRecord = {{ $AUTO_CAPTION_ON_RECORD }};
 
 {{ if .Env.DYNAMIC_BRANDING_URL -}}
 // External API url used to receive branding specific information.
