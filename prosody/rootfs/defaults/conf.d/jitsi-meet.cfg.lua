@@ -3,13 +3,12 @@
 {{ $ENABLE_RECORDING := .Env.ENABLE_RECORDING | default "0" | toBool }}
 {{ $AUTH_TYPE := .Env.AUTH_TYPE | default "internal" }}
 {{ $JIBRI_XMPP_USER := .Env.JIBRI_XMPP_USER | default "jibri" -}}
-{{ $JICOFO_AUTH_USER := .Env.JICOFO_AUTH_USER | default "focus" -}}
 {{ $JIGASI_XMPP_USER := .Env.JIGASI_XMPP_USER | default "jigasi" -}}
 {{ $JVB_AUTH_USER := .Env.JVB_AUTH_USER | default "jvb" -}}
 {{ $JWT_ASAP_KEYSERVER := .Env.JWT_ASAP_KEYSERVER | default "" }}
 {{ $JWT_ALLOW_EMPTY := .Env.JWT_ALLOW_EMPTY | default "0" | toBool }}
 {{ $JWT_AUTH_TYPE := .Env.JWT_AUTH_TYPE | default "token" }}
-{{ $JWT_ENABLE_DOMAIN_VERIFICATION := .Env.JWT_ENABLE_DOMAIN_VERIFICATION | default "true" | toBool -}}
+{{ $JWT_ENABLE_DOMAIN_VERIFICATION := .Env.JWT_ENABLE_DOMAIN_VERIFICATION | default "false" | toBool -}}
 {{ $MATRIX_UVS_ISSUER := .Env.MATRIX_UVS_ISSUER | default "issuer" }}
 {{ $MATRIX_UVS_SYNC_POWER_LEVELS := .Env.MATRIX_UVS_SYNC_POWER_LEVELS | default "0" | toBool }}
 {{ $JWT_TOKEN_AUTH_MODULE := .Env.JWT_TOKEN_AUTH_MODULE | default "token_verification" }}
@@ -19,6 +18,7 @@
 {{ $ENABLE_END_CONFERENCE := .Env.ENABLE_END_CONFERENCE | default "true" | toBool }}
 {{ $ENABLE_XMPP_WEBSOCKET := .Env.ENABLE_XMPP_WEBSOCKET | default "1" | toBool }}
 {{ $ENABLE_JAAS_COMPONENTS := .Env.ENABLE_JAAS_COMPONENTS | default "0" | toBool }}
+{{ $ENABLE_RATE_LIMITS := .Env.PROSODY_ENABLE_RATE_LIMITS | default "0" | toBool }}
 {{ $PUBLIC_URL := .Env.PUBLIC_URL | default "https://localhost:8443" -}}
 {{ $PUBLIC_URL_DOMAIN := $PUBLIC_URL | trimPrefix "https://" | trimSuffix "/" -}}
 {{ $TURN_PORT := .Env.TURN_PORT | default "443" }}
@@ -32,10 +32,17 @@
 {{ $XMPP_MUC_DOMAIN := .Env.XMPP_MUC_DOMAIN | default "muc.meet.jitsi" -}}
 {{ $XMPP_MUC_DOMAIN_PREFIX := (split "." $XMPP_MUC_DOMAIN)._0 }}
 {{ $XMPP_RECORDER_DOMAIN := .Env.XMPP_RECORDER_DOMAIN | default "recorder.meet.jitsi" -}}
+{{ $JIBRI_RECORDER_USER := .Env.JIBRI_RECORDER_USER | default "recorder" -}}
+{{ $JIGASI_TRANSCRIBER_USER := .Env.JIGASI_TRANSCRIBER_USER | default "transcriber" -}}
 {{ $DISABLE_POLLS := .Env.DISABLE_POLLS | default "false" | toBool -}}
 {{ $ENABLE_SUBDOMAINS := .Env.ENABLE_SUBDOMAINS | default "true" | toBool -}}
 {{ $PROSODY_RESERVATION_ENABLED := .Env.PROSODY_RESERVATION_ENABLED | default "false" | toBool }}
 {{ $PROSODY_RESERVATION_REST_BASE_URL := .Env.PROSODY_RESERVATION_REST_BASE_URL | default "" }}
+{{ $RATE_LIMIT_LOGIN_RATE := .Env.PROSODY_RATE_LIMIT_LOGIN_RATE | default "3" }}
+{{ $RATE_LIMIT_SESSION_RATE := .Env.PROSODY_RATE_LIMIT_SESSION_RATE | default "200" }}
+{{ $RATE_LIMIT_TIMEOUT := .Env.PROSODY_RATE_LIMIT_TIMEOUT | default "60" }}
+{{ $RATE_LIMIT_ALLOW_RANGES := .Env.PROSODY_RATE_LIMIT_ALLOW_RANGES | default "10.0.0.0/8" }}
+{{ $RATE_LIMIT_CACHE_SIZE := .Env.PROSODY_RATE_LIMIT_CACHE_SIZE | default "10000" }}
 {{ $ENV := .Env -}}
 
 admins = {
@@ -47,12 +54,12 @@ admins = {
     "{{ $JIBRI_XMPP_USER }}@{{ $XMPP_AUTH_DOMAIN }}",
     {{ end }}
 
-    "{{ $JICOFO_AUTH_USER }}@{{ $XMPP_AUTH_DOMAIN }}",
+    "focus@{{ $XMPP_AUTH_DOMAIN }}",
     "{{ $JVB_AUTH_USER }}@{{ $XMPP_AUTH_DOMAIN }}"
 }
 
 unlimited_jids = {
-    "{{ $JICOFO_AUTH_USER }}@{{ $XMPP_AUTH_DOMAIN }}",
+    "focus@{{ $XMPP_AUTH_DOMAIN }}",
     "{{ $JVB_AUTH_USER }}@{{ $XMPP_AUTH_DOMAIN }}"
 }
 
@@ -156,6 +163,7 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
         "ping";
         "speakerstats";
         "conference_duration";
+        "room_metadata";
         {{ if $ENABLE_END_CONFERENCE }}
         "end_conference";
         {{ end }}
@@ -203,7 +211,7 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
     conference_duration_component = "conferenceduration.{{ $XMPP_DOMAIN }}"
 
     {{ if $ENABLE_END_CONFERENCE }}
-    end_conference_component = "endconference.{{ .Env.XMPP_DOMAIN }}"
+    end_conference_component = "endconference.{{ $XMPP_DOMAIN }}"
     {{ end }}
 
     {{ if $ENABLE_AV_MODERATION }}
@@ -250,6 +258,7 @@ Component "{{ $XMPP_INTERNAL_MUC_DOMAIN }}" "muc"
     muc_room_default_public_jids = true
 
 Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
+    restrict_room_creation = true
     storage = "memory"
     modules_enabled = {
         "muc_meeting_id";
@@ -268,10 +277,40 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         {{ if $ENABLE_SUBDOMAINS -}}
         "muc_domain_mapper";
         {{ end -}}
+        {{ if $ENABLE_RATE_LIMITS -}}
+        "muc_rate_limit";
+        "rate_limit";
+        {{ end -}}
         {{ if .Env.MAX_PARTICIPANTS }}
         "muc_max_occupants";
         {{ end }}
+        "muc_password_whitelist";
     }
+
+    {{ if $ENABLE_RATE_LIMITS -}}
+    -- Max allowed join/login rate in events per second.
+	rate_limit_login_rate = {{ $RATE_LIMIT_LOGIN_RATE }};
+	-- The rate to which sessions from IPs exceeding the join rate will be limited, in bytes per second.
+	rate_limit_session_rate = {{ $RATE_LIMIT_SESSION_RATE }};
+	-- The time in seconds, after which the limit for an IP address is lifted.
+	rate_limit_timeout = {{ $RATE_LIMIT_TIMEOUT }};
+	-- List of regular expressions for IP addresses that are not limited by this module.
+	rate_limit_whitelist = {
+      "127.0.0.1";
+      {{ range $index, $cidr := (splitList "," $RATE_LIMIT_ALLOW_RANGES) -}}
+      "{{ $cidr }}";
+      {{ end -}}
+    };
+
+    rate_limit_whitelist_jids = {
+        "{{ $JIBRI_RECORDER_USER }}@{{ $XMPP_RECORDER_DOMAIN }}",
+        "{{ $JIGASI_TRANSCRIBER_USER }}@{{ $XMPP_RECORDER_DOMAIN }}"
+    }
+    {{ end -}}
+
+	-- The size of the cache that saves state for IP addresses
+	rate_limit_cache_size = {{ $RATE_LIMIT_CACHE_SIZE }};
+
     muc_room_cache_size = 1000
     muc_room_locking = false
     muc_room_default_public_jids = true
@@ -279,12 +318,15 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
     {{ join "\n" (splitList "," .Env.XMPP_MUC_CONFIGURATION) }}
     {{ end -}}
     {{ if .Env.MAX_PARTICIPANTS }}
-    muc_access_whitelist = { "{{ .Env.JICOFO_AUTH_USER }}@{{ .Env.XMPP_AUTH_DOMAIN }}" }
+    muc_access_whitelist = { "focus@{{ .Env.XMPP_AUTH_DOMAIN }}" }
     muc_max_occupants = "{{ .Env.MAX_PARTICIPANTS }}"
     {{ end }}
+    muc_password_whitelist = {
+        "focus@{{ .Env.XMPP_AUTH_DOMAIN }}"
+    }
 
 Component "focus.{{ $XMPP_DOMAIN }}" "client_proxy"
-    target_address = "{{ $JICOFO_AUTH_USER }}@{{ $XMPP_AUTH_DOMAIN }}"
+    target_address = "focus@{{ $XMPP_AUTH_DOMAIN }}"
     component_conflict_resolve = "kick_old"
 
 Component "speakerstats.{{ $XMPP_DOMAIN }}" "speakerstats_component"
@@ -294,8 +336,8 @@ Component "conferenceduration.{{ $XMPP_DOMAIN }}" "conference_duration_component
     muc_component = "{{ $XMPP_MUC_DOMAIN }}"
 
 {{ if $ENABLE_END_CONFERENCE }}
-Component "endconference.{{ .Env.XMPP_DOMAIN }}" "end_conference"
-    muc_component = "{{ .Env.XMPP_MUC_DOMAIN }}"
+Component "endconference.{{ $XMPP_DOMAIN }}" "end_conference"
+    muc_component = "{{ $XMPP_MUC_DOMAIN }}"
 {{ end }}
 
 {{ if $ENABLE_AV_MODERATION }}
@@ -309,7 +351,13 @@ Component "lobby.{{ $XMPP_DOMAIN }}" "muc"
     restrict_room_creation = true
     muc_room_locking = false
     muc_room_default_public_jids = true
-{{ end }}
+    modules_enabled = {
+        {{ if $ENABLE_RATE_LIMITS -}}
+        "muc_rate_limit";
+        {{ end -}}
+    }
+
+    {{ end }}
 
 {{ if $ENABLE_BREAKOUT_ROOMS }}
 Component "breakout.{{ $XMPP_DOMAIN }}" "muc"
@@ -325,5 +373,12 @@ Component "breakout.{{ $XMPP_DOMAIN }}" "muc"
         {{ if not $DISABLE_POLLS -}}
         "polls";
         {{ end -}}
+        {{ if $ENABLE_RATE_LIMITS -}}
+        "muc_rate_limit";
+        {{ end -}}
     }
 {{ end }}
+
+Component "metadata.{{ $XMPP_DOMAIN }}" "room_metadata_component"
+    muc_component = "{{ $XMPP_MUC_DOMAIN }}"
+    breakout_rooms_component = "breakout.{{ $XMPP_DOMAIN }}"

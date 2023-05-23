@@ -1,3 +1,73 @@
+## stable-8615
+
+Based on stable release 8615.
+
+* 57e3bb3 jibri: bump Chrome version
+* a0a3410 fix: Allows jicofo entering rooms without requiring a password.
+* 1c27da8 prosody: fix ranges redux (#1538)
+* 9fc8ffa prosody: fix ranges definition (#1537)
+* 39de818 prosody: enable rate limits (#1536)
+* 3568542 prosody: add timestamps to the log
+* edb5e76 workflow: tag jibri and jigasi images with version (#1522)
+* 5d1d80d jvb: fix missing dot in env (#1521)
+* 0b1b45d base: use FQIN in base/Dockerfile FROM statement
+* 29f0cb2 actions: tag images with detected versions (#1518)
+* 7c50cb7 web: support loading pwa-worker.js from subdir (#1517)
+* 3af59c6 web: fix bosh for subdomains
+* 2fdc643 jicofo: use bool instead of string for codec flags (#1507)
+* bdcae29 jicofo: fix syntax error on opus end brace (#1506)
+* e5d4213 jicofo: additional conference options (#1504)
+* 6034e09 jicofo: support opus red audio codec (#1503)
+* ef7ef9c jicofo: disable cert verification for jvb xmpp (#1501)
+* a8fe1aa jicofo: fix template error in jvb xmpp server (#1500)
+* 7d1bf8e jicofo: flag to use presence for bridge health checks (#1499)
+* 1a4f9bd jicofo: fix broken rest template (#1498)
+* 76f886f jicofo: add bridge region support and local region (#1497)
+* 9c2f742 jicofo: fix rest bind in container (#1496)
+* ed095bc misc: support alternate xmpp server for jvb (#1495)
+* e1c1f1b jicofo: enable rest interface (#1494)
+* ca0b92e web: allow custom colibri websocket port (#1491)
+* fe5dea3 misc: working on unstable
+
+## stable-8319
+
+Based on stable release 8319.
+
+* 57e852f build: fix native build on M1 macs
+* 1cdf970 prosody: fix "<no value>" issue in prosody config
+* 4a0b48c etherpad: suppress errors in pad
+* 15335c0 misc: working on unstable
+
+## stable-8252
+
+Based on stable release 8252.
+
+* 076dbf7 jibri: fix downloading new (>= 109) ChromeDriver
+* 8f40804 jibri: update Chrome to M109
+* 1cf8638 compose: fix whiteboard collab server variable name
+* 9e0305b prosody: set JWT_ENABLE_DOMAIN_VERIFICATION to false by default
+* ac551c3 base: update tpl
+* ec972ee base: update tpl
+* 8684b0b misc: working on unstable
+
+## stable-8218
+
+Based on stable release 8218.
+
+* 8d7728b jibri: update Chrome to M108
+* 9cfbaf2 misc: drop JICOFO_AUTH_USER
+* 68751c2 prosody: add metadata component
+* 07f7054 jaas: pass the jitsi installation type at provisioning (#1456)
+* e219bcf web: add ability to configure whiteboard
+* ac12313 misc: working on unstable
+
+## stable-8138-1
+
+Based on stable release 8138-1.
+
+* 8923b72 web: fix missing quotes on config.js string
+* 6b11a89 misc: working on unstable
+
 ## stable-8138
 
 Based on stable release 8138.
