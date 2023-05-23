@@ -51,7 +51,9 @@ else
 build:
 	@echo "Building for $(TARGETPLATFORM)"
 	docker build \
-		$(BUILD_ARGS) --build-arg TARGETPLATFORM=$(TARGETPLATFORM) \
+		$(BUILD_ARGS) \
+		--build-arg TARGETPLATFORM=$(TARGETPLATFORM) \
+		--build-arg BASE_TAG=$(JITSI_BUILD) \
 		--progress plain \
 		--tag $(JITSI_REPO)/$(JITSI_SERVICE) \
 		$(JITSI_SERVICE)
