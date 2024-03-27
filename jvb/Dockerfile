@@ -13,7 +13,7 @@ RUN apt-dpkg-wrap apt-get update && \
     apt-cleanup
 
 # To bind the port number less than 1024 with non-root access.
-RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 
 COPY rootfs/ /
 
