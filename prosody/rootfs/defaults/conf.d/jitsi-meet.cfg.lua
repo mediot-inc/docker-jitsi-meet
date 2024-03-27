@@ -311,6 +311,8 @@ Component "{{ $XMPP_INTERNAL_MUC_DOMAIN }}" "muc"
     muc_room_locking = false
     muc_room_default_public_jids = true
     muc_room_cache_size = 1000
+    muc_tombstones = false
+    muc_room_allow_persistent = false
 
 Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
     restrict_room_creation = true
@@ -363,9 +365,8 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
 {{ end }}
     };
 
-    rate_limit_whitelist_jids = {
-        "{{ $JIBRI_RECORDER_USER }}@{{ $XMPP_RECORDER_DOMAIN }}",
-        "{{ $JIGASI_TRANSCRIBER_USER }}@{{ $XMPP_RECORDER_DOMAIN }}"
+    rate_limit_whitelist_hosts = {
+        "{{ $XMPP_RECORDER_DOMAIN }}";
     }
     {{ end -}}
 
@@ -379,11 +380,11 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
     {{ join "\n    " (splitList "," .Env.XMPP_MUC_CONFIGURATION) }}
     {{ end -}}
     {{ if .Env.MAX_PARTICIPANTS }}
-    muc_access_whitelist = { "focus@{{ .Env.XMPP_AUTH_DOMAIN }}" }
+    muc_access_whitelist = { "focus@{{ $XMPP_AUTH_DOMAIN }}" }
     muc_max_occupants = "{{ .Env.MAX_PARTICIPANTS }}"
     {{ end }}
     muc_password_whitelist = {
-        "focus@{{ .Env.XMPP_AUTH_DOMAIN }}";
+        "focus@{{ $XMPP_AUTH_DOMAIN }}";
 {{- if $ENABLE_RECORDING }}
         "{{ $JIBRI_RECORDER_USER }}@{{ $XMPP_RECORDER_DOMAIN }}";
 {{- end }}
@@ -391,6 +392,8 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         "{{ $JIGASI_TRANSCRIBER_USER }}@{{ $XMPP_RECORDER_DOMAIN }}";
 {{- end }}
     }
+    muc_tombstones = false
+    muc_room_allow_persistent = false
 
 Component "focus.{{ $XMPP_DOMAIN }}" "client_proxy"
     target_address = "focus@{{ $XMPP_AUTH_DOMAIN }}"
@@ -421,6 +424,7 @@ Component "avmoderation.{{ $XMPP_DOMAIN }}" "av_moderation_component"
 Component "lobby.{{ $XMPP_DOMAIN }}" "muc"
     storage = "memory"
     restrict_room_creation = true
+    muc_tombstones = false
     muc_room_allow_persistent = false
     muc_room_cache_size = 10000
     muc_room_locking = false
@@ -443,6 +447,7 @@ Component "breakout.{{ $XMPP_DOMAIN }}" "muc"
     muc_room_cache_size = 10000
     muc_room_locking = false
     muc_room_default_public_jids = true
+    muc_tombstones = false
     muc_room_allow_persistent = false
     modules_enabled = {
         "muc_meeting_id";
@@ -466,4 +471,5 @@ Component "metadata.{{ $XMPP_DOMAIN }}" "room_metadata_component"
 {{ if $ENABLE_VISITORS }}
 Component "visitors.{{ $XMPP_DOMAIN }}" "visitors_component"
     auto_allow_visitor_promotion = true
+    always_visitors_enabled = true
 {{ end }}
