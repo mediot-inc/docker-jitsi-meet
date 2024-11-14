@@ -48,7 +48,7 @@
 {{ $DESKTOP_SHARING_FRAMERATE_MIN := .Env.DESKTOP_SHARING_FRAMERATE_MIN | default 5 -}}
 {{ $DESKTOP_SHARING_FRAMERATE_MAX := .Env.DESKTOP_SHARING_FRAMERATE_MAX | default 5 -}}
 {{ $XMPP_DOMAIN := .Env.XMPP_DOMAIN | default "meet.jitsi" -}}
-{{ $XMPP_RECORDER_DOMAIN := .Env.XMPP_RECORDER_DOMAIN | default "recorder.meet.jitsi" -}}
+{{ $XMPP_HIDDEN_DOMAIN := .Env.XMPP_HIDDEN_DOMAIN | default "hidden.meet.jitsi" -}}
 {{ $DISABLE_DEEP_LINKING  := .Env.DISABLE_DEEP_LINKING | default "false" | toBool -}}
 {{ $DISABLE_POLLS := .Env.DISABLE_POLLS | default "false" | toBool -}}
 {{ $DISABLE_REACTIONS := .Env.DISABLE_REACTIONS | default "false" | toBool -}}
@@ -149,9 +149,12 @@ config.etherpad_base = '{{ $PUBLIC_URL }}/etherpad/p/';
 // Recording.
 //
 
-{{ if $ENABLE_RECORDING  -}}
+{{ if or $ENABLE_RECORDING $ENABLE_TRANSCRIPTIONS  -}}
 
-config.hiddenDomain = '{{ $XMPP_RECORDER_DOMAIN }}';
+config.hiddenDomain = '{{ $XMPP_HIDDEN_DOMAIN }}';
+{{ end -}}
+
+{{ if $ENABLE_RECORDING -}}
 
 config.recordingService = {
     // Whether to enable file recording or not using the "service" defined by the finalizer in Jibri
@@ -224,11 +227,11 @@ config.analytics.matomoSiteID = '{{ .Env.MATOMO_SITE_ID }}';
 
 {{ if .Env.ANALYTICS_SCRIPT_URLS -}}
 // Array of script URLs to load as lib-jitsi-meet "analytics handlers".
-config.analytics.scriptURLs = [ '{{ join "','" (splitList "," .Env.ANALYTICS_SCRIPT_URLS) }}' ];
+config.analytics.scriptURLs = [ '{{ join "','" (splitList "," .Env.ANALYTICS_SCRIPT_URLS | compact) }}' ];
 {{ end -}}
 
 {{ if .Env.ANALYTICS_WHITELISTED_EVENTS -}}
-config.analytics.whiteListedEvents = [ '{{ join "','" (splitList "," .Env.ANALYTICS_WHITELISTED_EVENTS) }}' ];
+config.analytics.whiteListedEvents = [ '{{ join "','" (splitList "," .Env.ANALYTICS_WHITELISTED_EVENTS | compact) }}' ];
 {{ end -}}
 
 
@@ -296,7 +299,7 @@ config.prejoinConfig = {
 
 // List of buttons to hide from the extra join options dropdown on prejoin screen.
 {{ if .Env.HIDE_PREJOIN_EXTRA_BUTTONS -}}
-config.prejoinConfig.hideExtraJoinButtons = [ '{{ join "','" (splitList "," .Env.HIDE_PREJOIN_EXTRA_BUTTONS) }}' ];
+config.prejoinConfig.hideExtraJoinButtons = [ '{{ join "','" (splitList "," .Env.HIDE_PREJOIN_EXTRA_BUTTONS | compact) }}' ];
 {{ end -}}
 
 // Welcome page.
@@ -519,12 +522,12 @@ config.disablePolls = {{ $DISABLE_POLLS }};
 
 // Configure toolbar buttons
 {{ if .Env.TOOLBAR_BUTTONS -}}
-config.toolbarButtons = [ '{{ join "','" (splitList "," .Env.TOOLBAR_BUTTONS) }}' ];
+config.toolbarButtons = [ '{{ join "','" (splitList "," .Env.TOOLBAR_BUTTONS | compact) }}' ];
 {{ end -}}
 
 // Hides the buttons at pre-join screen
 {{ if .Env.HIDE_PREMEETING_BUTTONS -}}
-config.hiddenPremeetingButtons = [ '{{ join "','" (splitList "," .Env.HIDE_PREMEETING_BUTTONS) }}' ];
+config.hiddenPremeetingButtons = [ '{{ join "','" (splitList "," .Env.HIDE_PREMEETING_BUTTONS | compact) }}' ];
 {{ end -}}
 
 // Configure remote participant video menu
@@ -564,3 +567,53 @@ config.whiteboard = {
 config.testing = {
     enableAv1Support: {{ $TESTING_AV1_SUPPORT }}
 };
+
+// JaaS support: pre-configure image if JAAS_APP_ID was set.
+{{ if .Env.JAAS_APP_ID -}}
+{{ $JAAS_USE_STAGING := .Env.JAAS_USE_STAGING | default "false" | toBool -}}
+{{ $JAAS_DOMAIN := $JAAS_USE_STAGING | ternary "stage.8x8.vc" "8x8.vc" -}}
+
+config.hosts.domain = '{{ $JAAS_DOMAIN }}';
+config.hosts.muc = 'conference.{{ .Env.JAAS_APP_ID }}.{{ $JAAS_DOMAIN }}';
+config.hosts.focus = 'focus.{{ $JAAS_DOMAIN }}';
+
+config.analytics.rtcstatsEnabled = true;
+config.analytics.rtcstatsStoreLogs = true;
+config.analytics.rtcstatsUseLegacy = false;
+config.analytics.rtcstatsEndpoint = 'wss://rtcstats-server-8x8.jitsi.net/';
+config.analytics.rtcstatsPollInterval = 10000;
+config.analytics.rtcstatsSendSdp = true;
+
+config.bosh = 'https://{{ $JAAS_DOMAIN }}/{{ .Env.JAAS_APP_ID }}/http-bind';
+config.websocket = 'wss://{{ $JAAS_DOMAIN }}/{{ .Env.JAAS_APP_ID }}/xmpp-websocket';
+config.websocketKeepAliveUrl = 'https://{{ $JAAS_DOMAIN }}/{{ .Env.JAAS_APP_ID }}/_unlock';
+config.conferenceRequestUrl = 'https://{{ $JAAS_DOMAIN }}/{{ .Env.JAAS_APP_ID }}/conference-request/v1';
+
+config.hiddenDomain = 'recorder.{{ $JAAS_DOMAIN }}';
+config.hiddenFromRecorderFeatureEnabled = true;
+config.enableEmailInStats = true;
+
+config.jaasActuatorUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/jaas-actuator';
+config.jaasTokenUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/token-mapping';
+config.jaasConferenceCreatorUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/vmms-conference-mapper/v1/access/conference-creator';
+config.webhookProxyUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/webhook-proxy';
+config.billingCounterUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/billing-counter/v1/connection';
+config.brandingDataUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/branding/public/v1/conferences';
+config.dialInNumbersUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/vmms-conference-mapper/access/v1/dids';
+config.dialInConfCodeUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/vmms-conference-mapper/v1/access';
+config.dialOutAuthUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/phone-authorize';
+config.dialOutRegionUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/customer-configs/v1/outbound-destination';
+config.peopleSearchUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/v1/directory/search';
+config.inviteServiceUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/v1/meeting/invite';
+config.recordingSharingUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/jaas-recordings/link';
+config.peopleSearchQueryTypes = ['user','conferenceRooms'];
+config.sipInviteUrl = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/sip-jibri-gateway/jibris/invite';
+config.jaasFeedbackMetadataURL = 'https://{{ $JAAS_DOMAIN }}/v1/_jaas/webhook-proxy/feedback';
+
+{{ if $JAAS_USE_STAGING -}}
+config.whiteboard.collabServerBaseUrl = 'https://eght-excalidraw-backend-pilot.cloudflare.jitsi.net';
+{{ else -}}
+config.whiteboard.collabServerBaseUrl = 'https://eght-excalidraw-backend.cloudflare.jitsi.net';
+{{ end -}}
+config.whiteboard.userLimit = 25;
+{{ end -}}
