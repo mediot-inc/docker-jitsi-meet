@@ -72,6 +72,8 @@ plugin_paths = { "/prosody-plugins/", "/prosody-plugins-custom", "/prosody-plugi
 muc_mapper_domain_base = "{{ $XMPP_DOMAIN }}";
 muc_mapper_domain_prefix = "{{ $XMPP_MUC_DOMAIN_PREFIX }}";
 
+recorder_prefixes = { "{{ $JIBRI_RECORDER_USER }}@{{ $XMPP_HIDDEN_DOMAIN }}" };
+
 http_default_host = "{{ $XMPP_DOMAIN }}"
 
 {{ if and $ENABLE_AUTH (or (eq $PROSODY_AUTH_TYPE "jwt") (eq $PROSODY_AUTH_TYPE "hybrid_matrix_token")) .Env.JWT_ACCEPTED_ISSUERS }}
@@ -263,8 +265,10 @@ VirtualHost "{{ $XMPP_AUTH_DOMAIN }}"
         {{- if and $ENABLE_RECORDING_METADATA $ENABLE_AUTH (eq $PROSODY_AUTH_TYPE "jwt") $ENABLE_RECORDING }}
         "jibri_session";
         {{- end }}
+        "smacks";
     }
     authentication = "internal_hashed"
+    smacks_hibernation_time = 15;
 
 {{ if or $ENABLE_RECORDING $ENABLE_TRANSCRIPTIONS }}
 VirtualHost "{{ $XMPP_HIDDEN_DOMAIN }}"
