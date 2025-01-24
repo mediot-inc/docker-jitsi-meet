@@ -3,7 +3,7 @@ version: '3.5'
 services:
     # Frontend
     web:
-        image: jitsi/web:${JITSI_IMAGE_VERSION:-stable-9909}
+        image: jitsi/web:${JITSI_IMAGE_VERSION:-stable-9955}
         restart: ${RESTART_POLICY:-unless-stopped}
         ports:
             - '${HTTP_PORT}:80'
@@ -63,6 +63,7 @@ services:
             - DYNAMIC_BRANDING_URL
             - ENABLE_ADAPTIVE_MODE
             - ENABLE_AUDIO_PROCESSING
+            - ENABLE_AUTOMATIC_GAIN_CONTROL
             - ENABLE_AUTH
             - ENABLE_AUTH_DOMAIN
             - ENABLE_BREAKOUT_ROOMS
@@ -132,6 +133,7 @@ services:
             - PREFERRED_LANGUAGE
             - PUBLIC_URL
             - P2P_PREFERRED_CODEC
+            - P2P_STUN_SERVERS
             - RESOLUTION
             - RESOLUTION_MIN
             - RESOLUTION_WIDTH
@@ -190,7 +192,7 @@ services:
 
     # XMPP server
     prosody:
-        image: jitsi/prosody:${JITSI_IMAGE_VERSION:-stable-9909}
+        image: jitsi/prosody:${JITSI_IMAGE_VERSION:-stable-9955}
         restart: ${RESTART_POLICY:-unless-stopped}
         expose:
             - '${XMPP_PORT:-5222}'
@@ -339,7 +341,7 @@ services:
 
     # Focus component
     jicofo:
-        image: jitsi/jicofo:${JITSI_IMAGE_VERSION:-stable-9909}
+        image: jitsi/jicofo:${JITSI_IMAGE_VERSION:-stable-9955}
         restart: ${RESTART_POLICY:-unless-stopped}
         ports:
             - '127.0.0.1:${JICOFO_REST_PORT:-8888}:8888'
@@ -427,7 +429,7 @@ services:
 
     # Video bridge
     jvb:
-        image: jitsi/jvb:${JITSI_IMAGE_VERSION:-stable-9909}
+        image: jitsi/jvb:${JITSI_IMAGE_VERSION:-stable-9955}
         restart: ${RESTART_POLICY:-unless-stopped}
         ports:
             - '${JVB_PORT:-10000}:${JVB_PORT:-10000}/udp'
