@@ -33,9 +33,10 @@ $(addprefix buildx_,$(JITSI_SERVICES)):
 	$(MAKE) --no-print-directory JITSI_SERVICE=$(patsubst buildx_%,%,$@) buildx
 
 build:
-	docker build \
+	docker buildx build \
 		$(BUILD_ARGS) \
 		--build-arg BASE_TAG=$(BASE_TAG) \
+		--load \
 		--progress plain \
 		--tag $(JITSI_REPO)/$(JITSI_SERVICE) \
 		$(JITSI_SERVICE)
